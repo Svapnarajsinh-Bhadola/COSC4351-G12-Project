@@ -3,7 +3,7 @@ from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
 from wtforms import TextAreaField, TelField, StringField, PasswordField, SubmitField, BooleanField, IntegerField, \
     DateField, TimeField, SelectMultipleField
-
+from datetime import datetime, time
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from tableres.models import User, Reservation, Tables, Creditcard
 
@@ -91,9 +91,9 @@ class ReservationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     ph_num = TelField('Phone Number')
     num_Guests = IntegerField('Number of Guests', validators=[DataRequired()])
-    date = DateField('date', validators=[DataRequired()])
-    time = TimeField('time', validators=[DataRequired()])
-    submit = SubmitField('submit')
+    date = DateField('Date', validators=[DataRequired()])
+    time = TimeField('Time', description="Select only full hours with 00 in minutes for successful reservation!! i.e.: 11:00", validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 class TableForm(FlaskForm):
     table_slt = SelectMultipleField('Select necessary tables', choices=Tables.query.all())
