@@ -25,17 +25,27 @@ def home():
                                       no_guest=formres.num_Guests.data,
                                       res_date=formres.date.data,
                                       res_time=formres.time.data)
-            db.session.add(reservation)
-            db.session.commit()
-            msg = Message('New Reservation', sender='tempsender6@gmail.com',
-                          recipients=['rajbhadola408@gmail.com', formres.email.data])
-            bodymsg = 'New reservation made please ensure the seating is available. for more details signin the system.'
-            msg.body = bodymsg
-            mail.send(msg)
+            availseats = Reservation.query.filter_by(res_date=formres.date.data, res_time=formres.time.data)
+            total = 0
+            for x in availseats:
+                total += x.no_guest
 
-            flash(Markup('Please <a href="/register" class="alert-link">Create an account</a> for the best user experience!!') , 'success')
+            if total < 20:
+                db.session.add(reservation)
+                db.session.commit()
+                msg = Message('New Reservation', sender='tempsender6@gmail.com',
+                              recipients=['rajbhadola408@gmail.com', formres.email.data])
+                bodymsg = 'New reservation made please ensure the seating is available. for more details signin the system.'
+                msg.body = bodymsg
+                mail.send(msg)
+                flash(Markup(
+                    'Please <a href="/register" class="alert-link">Create an account</a> for the best user experience!!'),
+                      'success')
+                return redirect(url_for('paymentout'))
 
-            return redirect(url_for('paymentout'))
+            else:
+                flash('Seats for the selected time are not available. please select other times!!', 'error')
+
         return render_template('reserve.html', title='Reservation', form=formres)
 
 
@@ -156,14 +166,25 @@ def reserve():
                                   res_date=form1.date.data,
                                   res_time=form1.time.data,
                                   customer=current_user)
-        db.session.add(reservation)
-        db.session.commit()
-        msg = Message('New Reservation', sender='tempsender6@gmail.com', recipients=['rajbhadola408@gmail.com', form1.email.data])
-        bodymsg = 'New reservation made please ensure the seating is available. for more details signin the system.'
-        msg.body = bodymsg
-        mail.send(msg)
-        flash('Your Table has been Reserved!', 'success')
-        return redirect(url_for('payment'))
+        availseats = Reservation.query.filter_by(res_date=form1.date.data, res_time=form1.time.data)
+        total = 0
+        for x in availseats:
+            total += x.no_guest
+
+        if total < 20:
+            db.session.add(reservation)
+            db.session.commit()
+            msg = Message('New Reservation', sender='tempsender6@gmail.com', recipients=['rajbhadola408@gmail.com', form1.email.data])
+            bodymsg = 'New reservation made please ensure the seating is available. for more details signin the system.'
+            msg.body = bodymsg
+            mail.send(msg)
+            resquery = Creditcard.query.filter_by(user_id=current_user.id)
+            for i in resquery:
+                if current_user.id != i.user_id:
+                    return redirect(url_for('payment'))
+        else:
+            flash('Seats for the selected time are not available', 'failure')
+        return redirect(url_for('home'))
     return render_template('reserve.html', title='Reservation', form=form1)
 
 
