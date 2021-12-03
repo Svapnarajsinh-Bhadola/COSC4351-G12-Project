@@ -180,8 +180,9 @@ def reserve():
             mail.send(msg)
             resquery = Creditcard.query.filter_by(user_id=current_user.id)
             for i in resquery:
-                if current_user.id != i.user_id:
+                if current_user.id == i.user_id:
                     return redirect(url_for('payment'))
+
         else:
             flash('Seats for the selected time are not available', 'failure')
         return redirect(url_for('home'))
