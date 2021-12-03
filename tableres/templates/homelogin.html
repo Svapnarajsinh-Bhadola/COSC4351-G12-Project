@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h4>Your Reservations</h4>
+
+    {% for reservation1 in reservation %}
+        <article class="media content-section">
+          <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + reservation1.customer.image_file) }}">
+          <div class="media-body">
+            <div class="article-metadata">
+              <h4><a class="mr-2"> Guest Name: {{ reservation1.customer.user_fname }}</a></h4>
+            </div>
+            <div>
+              <a class="mr-2">Reservation id: {{ reservation1.res_id }}</a>
+
+            </div>
+            <a class="article-content">Reservation time: {{ reservation1.res_date }} {{ reservation1.res_time}}</a>
+            <div>
+            <a class="article-content">No. of Guests: {{ reservation1.no_guest }}</a>
+            </div>
+          </div>
+        </article>
+    {% endfor %}
+{% endblock content %}
